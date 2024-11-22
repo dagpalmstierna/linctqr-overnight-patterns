@@ -9,17 +9,19 @@ class Security:
         self.dataframe = yf.Ticker(self.ticker).history(period="max")
         self.performance_tracker = PerformanceTracker()
         self.trade_conditions = trade_conditions or []  # List of conditions to check
-
+       
     def find_reversals(self):
         df = self.dataframe
         reversals = pd.DataFrame()
         df.index = pd.to_datetime(df.index)
-
-        for i in range(len(df) - 1):
+        
+        for i in range(1, len(df) - 1):
             open_price = df.iloc[i]["Open"]
             close_price = df.iloc[i]["Close"]
             open_next_day = df.iloc[i + 1]["Open"]
             date = df.index[i]
+            previous_day_close = df.iloc[i - 1]["Close"]
+            previous_day_open = df.iloc[i-1]["Open"]
 
             if open_price > close_price:
                 self.performance_tracker.record_red_day()
@@ -27,15 +29,22 @@ class Security:
                     self.performance_tracker.record_reversal()
                     reversals = pd.concat([reversals, df.iloc[[i]], df.iloc[[i + 1]]])
 
-            if self.should_trade(date, open_price, close_price, open_next_day):
+            if self.should_trade(date, open_price, close_price, open_next_day, previous_day_close, previous_day_open):
                 self.performance_tracker.record_trade(close_price, (open_next_day - close_price))
-        
+
+            
+
         reversals.reset_index(drop=True, inplace=True)
         return reversals
 
-    def should_trade(self, date, open_price, close_price, open_next_day):
+    def should_trade(self, date, open_price, close_price, open_next_day, previous_day_close, previous_day_open):
         
-        return all(condition.should_trade(date, open_price, close_price, open_next_day) for condition in self.trade_conditions)
+        return all(condition.should_trade(date, open_price, close_price, open_next_day, previous_day_close, previous_day_open) for condition in self.trade_conditions)
 
     def get_performance_summary(self):
         return self.performance_tracker.get_summary()
+
+
+    
+
+

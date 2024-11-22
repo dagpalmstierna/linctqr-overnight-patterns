@@ -38,7 +38,7 @@ def SMA(values, n):
 class ReversalPatternStrategy(Strategy):
     # Define the two MA lags as *class variables*
     # for later optimization
-    close_price, 
+    
 
 
   
@@ -54,17 +54,17 @@ class ReversalPatternStrategy(Strategy):
         if self.data.Open[-2] > self.data.Close[-2]:
             # Buy at the close price of the current day
             self.trade_on_close = True; 
-            self.buy(size=self.position.size, )
+            self.buy(size=self.position.size)
 
         # If there is an open position, sell at the open price of the next day
         if self.position:
-            self.sell(size=self.position.size, price=self.data.Open[-1])
+            self.sell(size=self.position.size)
          
             
         # 3. Sell at the next day's open, unconditionally if in position
         
    
-        
+
         
 
 bt = Backtest(data, ReversalPatternStrategy, cash=10_000, commission=.002)
