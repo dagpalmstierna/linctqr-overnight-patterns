@@ -42,10 +42,10 @@ def run_tradingStrategy(tickers, conditions):
     
 
 # Example strategy with 2-day-down condition, Volatility between 15 - 20, a drop of at least 0.5 % and a close level within a 1 % treshold of daily low
-run_tradingStrategy(["IHYG.L", "SYBJ.DE"], [NDayDownCondition(2), BigDropCondition(), DailyLowCondition(), VolatilityCondition(20, 15)])
+# run_tradingStrategy(["IHYG.L", "SYBJ.DE"], [NDayDownCondition(2), BigDropCondition(), DailyLowCondition(), VolatilityCondition(20, 15)])
 
 # Running prediction model on iShares High Yield ETF historical data
-#run_predicter("IHYG.L")
+run_predicter("IHYG.L")
 
 
 
