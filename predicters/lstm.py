@@ -1,32 +1,32 @@
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import classification_report, accuracy_score
 from dataloader import DataLoader
 
+
 class LSTMModel:
     def __init__(self, dl=DataLoader(), sequence_length=10):
         self.df = dl.get_data()
         self.sequence_length = sequence_length
-        self.model = self.build_model()
+        self.model = self._build_model()
 
-    def build_model(self):
-        model = Sequential()
-        model.add(LSTM(50, return_sequences=True, input_shape=(self.sequence_length, self.df.shape[1] - 1)))
-        model.add(Dropout(0.2))
-        model.add(LSTM(50, return_sequences=False))
-        model.add(Dropout(0.2))
-        model.add(Dense(1, activation='sigmoid'))
+    def _build_model(self):
+        model = Sequential([
+            LSTM(50, return_sequences=True, input_shape=(self.sequence_length, self.df.shape[1] - 1)),
+            Dropout(0.2),
+            LSTM(50, return_sequences=False),
+            Dropout(0.2),
+            Dense(1, activation='sigmoid')
+        ])
         model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
         return model
 
     def create_sequences(self, data, target):
-        sequences = []
-        targets = []
+        sequences, targets = [], []
         for i in range(len(data) - self.sequence_length):
             sequences.append(data[i:i + self.sequence_length])
             targets.append(target[i + self.sequence_length])
@@ -50,9 +50,4 @@ class LSTMModel:
 
         y_pred = (self.model.predict(X_test) > 0.5).astype(int)
         print(classification_report(y_test, y_pred))
-        print("Accuracy on test set:", accuracy_score(y_test, y_pred))
-
-
-dl = DataLoader()
-lstm_model = LSTMModel(dl)
-lstm_model.run_model()
+        print(f"Accuracy: {accuracy_score(y_test, y_pred):.4f}")
